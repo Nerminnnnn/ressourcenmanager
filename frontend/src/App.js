@@ -323,7 +323,18 @@ function App() {
         </div>
       </div>
 
-      {/* Filter-Bereich */}
+      <div className="stats">
+        <div className="stat-card">
+          <h3>Gesamt Assets</h3>
+          <p className="stat-number">{items.length}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Gesamt Stückzahl</h3>
+          <p className="stat-number">{items.reduce((sum, item) => sum + item.quantity, 0)}</p>
+        </div>
+      </div>
+
+      {/* Filter-Bereich direkt über der Tabelle */}
       <div className="filters-section">
         <div className="filters-header">
           <h3>Filter & Sortierung</h3>
@@ -412,17 +423,6 @@ function App() {
             </div>
           </div>
         )}
-      </div>
-
-      <div className="stats">
-        <div className="stat-card">
-          <h3>Gesamt Assets</h3>
-          <p className="stat-number">{items.length}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Gesamt Stückzahl</h3>
-          <p className="stat-number">{items.reduce((sum, item) => sum + item.quantity, 0)}</p>
-        </div>
       </div>
 
       <div className="table-container">
