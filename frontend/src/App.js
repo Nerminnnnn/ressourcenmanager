@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Package, Search, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Package, Search, Edit, Trash2, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import './App.css';
+import { mockApi } from './mockApi';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -12,6 +13,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [useMockApi, setUseMockApi] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -22,14 +24,28 @@ function App() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/items`);
-      if (!response.ok) {
-        throw new Error('Fehler beim Laden der Items');
+      
+      if (useMockApi) {
+        const data = await mockApi.getItems();
+        setItems(data);
+      } else {
+        const response = await fetch(`${API_BASE_URL}/items`);
+        if (!response.ok) {
+          throw new Error('Backend nicht verfügbar - wechsle zu Mock-API');
+        }
+        const data = await response.json();
+        setItems(data);
       }
-      const data = await response.json();
-      setItems(data);
     } catch (err) {
-      setError(err.message);
+      if (!useMockApi) {
+        console.log('Backend nicht verfügbar, verwende Mock-API');
+        setUseMockApi(true);
+        const data = await mockApi.getItems();
+        setItems(data);
+        setError('Backend nicht verfügbar - verwende Demo-Daten');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -39,22 +55,33 @@ function App() {
   const saveItem = async (e) => {
     e.preventDefault();
     try {
-      const url = editingItem 
-        ? `${API_BASE_URL}/items/${editingItem.id}`
-        : `${API_BASE_URL}/items`;
+      let result;
       
-      const method = editingItem ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      if (useMockApi) {
+        if (editingItem) {
+          result = await mockApi.updateItem(editingItem.id, formData);
+        } else {
+          result = await mockApi.createItem(formData);
+        }
+      } else {
+        const url = editingItem 
+          ? `${API_BASE_URL}/items/${editingItem.id}`
+          : `${API_BASE_URL}/items`;
+        
+        const method = editingItem ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-      if (!response.ok) {
-        throw new Error('Fehler beim Speichern des Items');
+        if (!response.ok) {
+          throw new Error('Fehler beim Speichern des Items');
+        }
+        result = await response.json();
       }
 
       setSuccess(editingItem ? 'Item erfolgreich aktualisiert!' : 'Item erfolgreich hinzugefügt!');
@@ -74,12 +101,16 @@ function App() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/items/${id}`, {
-        method: 'DELETE',
-      });
+      if (useMockApi) {
+        await mockApi.deleteItem(id);
+      } else {
+        const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+          method: 'DELETE',
+        });
 
-      if (!response.ok) {
-        throw new Error('Fehler beim Löschen des Items');
+        if (!response.ok) {
+          throw new Error('Fehler beim Löschen des Items');
+        }
       }
 
       setSuccess('Item erfolgreich gelöscht!');
@@ -153,6 +184,19 @@ function App() {
           Ressourcenmanager
         </h1>
         <p>Verwalten Sie Ihre Items effizient</p>
+        <div className="connection-status">
+          {useMockApi ? (
+            <div className="status-indicator offline">
+              <WifiOff size={16} />
+              Demo-Modus (Backend nicht verfügbar)
+            </div>
+          ) : (
+            <div className="status-indicator online">
+              <Wifi size={16} />
+              Verbunden mit Backend
+            </div>
+          )}
+        </div>
       </header>
 
       {error && (

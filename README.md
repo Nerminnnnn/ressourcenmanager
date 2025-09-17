@@ -38,31 +38,33 @@ Eine moderne Web-Anwendung zur Verwaltung von Items/Ressourcen, entwickelt mit J
 
 ### 🚀 Schnellstart (Empfohlen)
 
-#### Windows:
+#### Frontend starten (funktioniert immer):
 ```bash
-# Doppelklick auf start.bat
-# Oder in der Kommandozeile:
-start.bat
-```
-
-#### Linux/Mac:
-```bash
-# In der Kommandozeile:
-./start.sh
-```
-
-#### Oder manuell:
-```bash
-# 1. Alle Dependencies installieren
+# 1. Dependencies installieren
 npm install
 
-# 2. Anwendung starten (Backend + Frontend)
+# 2. Frontend starten
 npm run dev
 ```
 
-Das war's! Die Anwendung startet automatisch:
+Die Anwendung startet mit Demo-Daten:
+- **Frontend**: http://localhost:3000
+- **Status**: Demo-Modus (Backend nicht verfügbar)
+
+#### Vollständige Anwendung (mit Backend):
+```bash
+# 1. Maven installieren (siehe MAVEN_SETUP.md)
+# 2. Dependencies installieren
+npm install
+
+# 3. Vollständige Anwendung starten
+npm run dev:full
+```
+
+Die Anwendung startet mit echtem Backend:
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:8080
+- **Status**: Verbunden mit Backend
 
 ### 🔧 Manuelles Setup (Falls automatisch nicht funktioniert)
 
