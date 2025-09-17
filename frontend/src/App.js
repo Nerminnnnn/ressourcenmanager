@@ -14,6 +14,12 @@ function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [useMockApi, setUseMockApi] = useState(false);
+  const [filters, setFilters] = useState({
+    quantityFilter: 'all', // all, low, medium, high
+    dateFilter: 'all', // all, today, week, month
+    sortBy: 'name', // name, quantity, date
+    sortOrder: 'asc' // asc, desc
+  });
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -142,10 +148,106 @@ function App() {
   };
 
   // Items filtern
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Filter-Funktionen
+  const applyFilters = (items) => {
+    let filtered = items;
+
+    // Suchfilter
+    if (searchTerm) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Mengenfilter
+    if (filters.quantityFilter !== 'all') {
+      filtered = filtered.filter(item => {
+        switch (filters.quantityFilter) {
+          case 'low':
+            return item.quantity < 5;
+          case 'medium':
+            return item.quantity >= 5 && item.quantity < 20;
+          case 'high':
+            return item.quantity >= 20;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Datumsfilter
+    if (filters.dateFilter !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.createdAt);
+        switch (filters.dateFilter) {
+          case 'today':
+            return itemDate.toDateString() === now.toDateString();
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            return itemDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            return itemDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Sortierung
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (filters.sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'quantity':
+          aValue = a.quantity;
+          bValue = b.quantity;
+          break;
+        case 'date':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      if (filters.sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  };
+
+  // Gefilterte Items
+  const filteredItems = applyFilters(items);
+
+  // Filter-Funktionen
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      quantityFilter: 'all',
+      dateFilter: 'all',
+      sortBy: 'name',
+      sortOrder: 'asc'
+    });
+    setSearchTerm('');
+  };
 
   // Low stock items
   const lowStockItems = items.filter(item => item.quantity < 5);
@@ -225,6 +327,97 @@ function App() {
               className="search-input"
             />
         </div>
+      </div>
+
+      {/* Filter-Bereich */}
+      <div className="filters-section">
+        <div className="filters-header">
+          <h3>Filter & Sortierung</h3>
+          <button onClick={resetFilters} className="btn btn-secondary">
+            Filter zurücksetzen
+          </button>
+        </div>
+        
+        <div className="filters-grid">
+          <div className="filter-group">
+            <label className="filter-label">Menge</label>
+            <select 
+              value={filters.quantityFilter} 
+              onChange={(e) => handleFilterChange('quantityFilter', e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">Alle Mengen</option>
+              <option value="low">Niedrig (&lt; 5)</option>
+              <option value="medium">Mittel (5-19)</option>
+              <option value="high">Hoch (≥ 20)</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Erstellt</label>
+            <select 
+              value={filters.dateFilter} 
+              onChange={(e) => handleFilterChange('dateFilter', e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">Alle Daten</option>
+              <option value="today">Heute</option>
+              <option value="week">Letzte Woche</option>
+              <option value="month">Letzter Monat</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Sortieren nach</label>
+            <select 
+              value={filters.sortBy} 
+              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+              className="filter-select"
+            >
+              <option value="name">Name</option>
+              <option value="quantity">Menge</option>
+              <option value="date">Erstellungsdatum</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Reihenfolge</label>
+            <select 
+              value={filters.sortOrder} 
+              onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
+              className="filter-select"
+            >
+              <option value="asc">Aufsteigend</option>
+              <option value="desc">Absteigend</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Aktive Filter anzeigen */}
+        {(filters.quantityFilter !== 'all' || filters.dateFilter !== 'all' || searchTerm) && (
+          <div className="active-filters">
+            <span className="active-filters-label">Aktive Filter:</span>
+            <div className="active-filters-list">
+              {searchTerm && (
+                <span className="filter-tag">
+                  Suche: "{searchTerm}"
+                </span>
+              )}
+              {filters.quantityFilter !== 'all' && (
+                <span className="filter-tag">
+                  Menge: {filters.quantityFilter === 'low' ? 'Niedrig' : 
+                          filters.quantityFilter === 'medium' ? 'Mittel' : 'Hoch'}
+                </span>
+              )}
+              {filters.dateFilter !== 'all' && (
+                <span className="filter-tag">
+                  Datum: {filters.dateFilter === 'today' ? 'Heute' : 
+                          filters.dateFilter === 'week' ? 'Letzte Woche' : 'Letzter Monat'}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="stats">
