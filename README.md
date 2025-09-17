@@ -31,40 +31,42 @@ Eine moderne Web-Anwendung zur Verwaltung von Items/Ressourcen, entwickelt mit J
 ## Installation und Setup
 
 ### Voraussetzungen
-- Java 17 oder höher
-- Node.js 16 oder höher
-- MySQL 8.0 oder höher
-- Maven 3.6 oder höher
+- **Node.js 16 oder höher** (erforderlich)
+- **Java 17 oder höher** (optional, für Backend)
+- **Maven 3.6 oder höher** (optional, für Backend)
+- **MySQL 8.0 oder höher** (optional, H2-Datenbank wird automatisch verwendet)
 
 ### 🚀 Schnellstart (Empfohlen)
 
-#### Frontend starten (funktioniert immer):
+#### Vollständige Anwendung starten:
 ```bash
 # 1. Dependencies installieren
 npm install
 
-# 2. Frontend starten
+# 2. Anwendung starten (Backend + Frontend)
 npm run dev
 ```
 
-Die Anwendung startet mit Demo-Daten:
+Die Anwendung startet automatisch:
 - **Frontend**: http://localhost:3000
-- **Status**: Demo-Modus (Backend nicht verfügbar)
+- **Backend**: http://localhost:8080 (falls Maven verfügbar)
+- **Status**: Backend + Frontend oder nur Frontend (Demo-Modus)
 
-#### Vollständige Anwendung (mit Backend):
+#### Mit MySQL (für Hosting):
 ```bash
-# 1. Maven installieren (siehe MAVEN_SETUP.md)
-# 2. Dependencies installieren
-npm install
+# 1. MySQL installieren (siehe MYSQL_INSTALL.md)
+# 2. Datenbank einrichten
+setup-mysql.bat
 
-# 3. Vollständige Anwendung starten
-npm run dev:full
+# 3. Anwendung starten
+npm run dev
 ```
 
-Die Anwendung startet mit echtem Backend:
+Die Anwendung startet mit MySQL:
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:8080
-- **Status**: Verbunden mit Backend
+- **MySQL**: localhost:3306
+- **MySQL Workbench**: Verbindung zu localhost:3306
 
 ### 🔧 Manuelles Setup (Falls automatisch nicht funktioniert)
 

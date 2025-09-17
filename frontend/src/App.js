@@ -55,13 +55,11 @@ function App() {
   const saveItem = async (e) => {
     e.preventDefault();
     try {
-      let result;
-      
       if (useMockApi) {
         if (editingItem) {
-          result = await mockApi.updateItem(editingItem.id, formData);
+          await mockApi.updateItem(editingItem.id, formData);
         } else {
-          result = await mockApi.createItem(formData);
+          await mockApi.createItem(formData);
         }
       } else {
         const url = editingItem 
@@ -81,10 +79,10 @@ function App() {
         if (!response.ok) {
           throw new Error('Fehler beim Speichern des Items');
         }
-        result = await response.json();
+        await response.json();
       }
 
-      setSuccess(editingItem ? 'Item erfolgreich aktualisiert!' : 'Item erfolgreich hinzugefügt!');
+      setSuccess(editingItem ? 'Asset erfolgreich aktualisiert!' : 'Asset erfolgreich hinzugefügt!');
       setShowModal(false);
       setEditingItem(null);
       setFormData({ name: '', description: '', quantity: 1 });
@@ -96,7 +94,7 @@ function App() {
 
   // Item löschen
   const deleteItem = async (id) => {
-    if (!window.confirm('Sind Sie sicher, dass Sie dieses Item löschen möchten?')) {
+    if (!window.confirm('Sind Sie sicher, dass Sie dieses Asset löschen möchten?')) {
       return;
     }
 
@@ -113,7 +111,7 @@ function App() {
         }
       }
 
-      setSuccess('Item erfolgreich gelöscht!');
+      setSuccess('Asset erfolgreich gelöscht!');
       fetchItems();
     } catch (err) {
       setError(err.message);
@@ -154,7 +152,7 @@ function App() {
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [useMockApi]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (success || error) {
@@ -181,9 +179,9 @@ function App() {
       <header className="header">
         <h1>
           <Package className="header-icon" />
-          Ressourcenmanager
+          Asset Manager
         </h1>
-        <p>Verwalten Sie Ihre Items effizient</p>
+        <p>Verwalten Sie Ihre Assets effizient</p>
         <div className="connection-status">
           {useMockApi ? (
             <div className="status-indicator offline">
@@ -221,23 +219,23 @@ function App() {
       <div className="controls">
         <div className="search-container">
           <Search className="search-icon" />
-          <input
-            type="text"
-            placeholder="Items durchsuchen..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+            <input
+              type="text"
+              placeholder="Assets durchsuchen..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
         </div>
         <button onClick={() => openModal()} className="btn btn-primary">
           <Plus size={20} />
-          Neues Item
+          Neues Asset
         </button>
       </div>
 
       <div className="stats">
         <div className="stat-card">
-          <h3>Gesamt Items</h3>
+          <h3>Gesamt Assets</h3>
           <p className="stat-number">{items.length}</p>
         </div>
         <div className="stat-card">
@@ -254,8 +252,8 @@ function App() {
         {filteredItems.length === 0 ? (
           <div className="empty-state">
             <Package size={64} />
-            <h3>Keine Items gefunden</h3>
-            <p>Fügen Sie Ihr erstes Item hinzu oder ändern Sie Ihre Suchkriterien.</p>
+            <h3>Keine Assets gefunden</h3>
+            <p>Fügen Sie Ihr erstes Asset hinzu oder ändern Sie Ihre Suchkriterien.</p>
           </div>
         ) : (
           filteredItems.map(item => (
@@ -300,7 +298,7 @@ function App() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">
-                {editingItem ? 'Item bearbeiten' : 'Neues Item hinzufügen'}
+                {editingItem ? 'Asset bearbeiten' : 'Neues Asset hinzufügen'}
               </h2>
               <button onClick={closeModal} className="close-btn">×</button>
             </div>

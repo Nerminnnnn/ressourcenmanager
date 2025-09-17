@@ -48,19 +48,19 @@ let nextId = 6;
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const mockApi = {
-  // Alle Items abrufen
+  // Alle Assets abrufen
   async getItems() {
     await delay(500);
     return [...MOCK_ITEMS];
   },
 
-  // Item nach ID abrufen
+  // Asset nach ID abrufen
   async getItem(id) {
     await delay(300);
     return MOCK_ITEMS.find(item => item.id === parseInt(id));
   },
 
-  // Neues Item erstellen
+  // Neues Asset erstellen
   async createItem(itemData) {
     await delay(400);
     const newItem = {
@@ -73,12 +73,12 @@ export const mockApi = {
     return newItem;
   },
 
-  // Item aktualisieren
+  // Asset aktualisieren
   async updateItem(id, itemData) {
     await delay(400);
     const index = MOCK_ITEMS.findIndex(item => item.id === parseInt(id));
     if (index === -1) {
-      throw new Error('Item nicht gefunden');
+      throw new Error('Asset nicht gefunden');
     }
     
     MOCK_ITEMS[index] = {
@@ -89,19 +89,19 @@ export const mockApi = {
     return MOCK_ITEMS[index];
   },
 
-  // Item löschen
+  // Asset löschen
   async deleteItem(id) {
     await delay(300);
     const index = MOCK_ITEMS.findIndex(item => item.id === parseInt(id));
     if (index === -1) {
-      throw new Error('Item nicht gefunden');
+      throw new Error('Asset nicht gefunden');
     }
     
     MOCK_ITEMS.splice(index, 1);
     return true;
   },
 
-  // Items durchsuchen
+  // Assets durchsuchen
   async searchItems(searchTerm) {
     await delay(300);
     const term = searchTerm.toLowerCase();
@@ -111,7 +111,7 @@ export const mockApi = {
     );
   },
 
-  // Items mit niedrigem Bestand
+  // Assets mit niedrigem Bestand
   async getLowStockItems(threshold = 5) {
     await delay(300);
     return MOCK_ITEMS.filter(item => item.quantity < threshold);
