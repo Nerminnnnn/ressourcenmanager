@@ -309,12 +309,6 @@ function App() {
         </div>
       )}
 
-      {lowStockItems.length > 0 && (
-        <div className="alert alert-error">
-          <AlertTriangle className="alert-icon" />
-          <strong>Niedrige Bestände:</strong> {lowStockItems.length} Item(s) haben weniger als 5 Stück
-        </div>
-      )}
 
       <div className="controls">
         <div className="search-container">
