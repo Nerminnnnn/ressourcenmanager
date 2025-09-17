@@ -177,23 +177,21 @@ function App() {
   return (
     <div className="container">
       <header className="header">
-        <h1>
-          <Package className="header-icon" />
-          Asset Manager
-        </h1>
-        <p>Verwalten Sie Ihre Assets effizient</p>
-        <div className="connection-status">
-          {useMockApi ? (
-            <div className="status-indicator offline">
-              <WifiOff size={16} />
-              Demo-Modus (Backend nicht verfügbar)
-            </div>
-          ) : (
-            <div className="status-indicator online">
-              <Wifi size={16} />
-              Verbunden mit Backend
-            </div>
-          )}
+        <div className="header-content">
+          <h1>Asset Manager</h1>
+          <div className="header-actions">
+            {useMockApi ? (
+              <div className="status-indicator offline">
+                <WifiOff size={16} />
+                Demo-Modus
+              </div>
+            ) : (
+              <div className="status-indicator online">
+                <Wifi size={16} />
+                Verbunden
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -227,10 +225,6 @@ function App() {
               className="search-input"
             />
         </div>
-        <button onClick={() => openModal()} className="btn btn-primary">
-          <Plus size={20} />
-          Neues Asset
-        </button>
       </div>
 
       <div className="stats">
@@ -248,7 +242,17 @@ function App() {
         </div>
       </div>
 
-      <div className="items-grid">
+      <div className="table-container">
+        <div className="table-header">
+          <h2 className="table-title">Assets ({filteredItems.length})</h2>
+          <div className="table-actions">
+            <button onClick={() => openModal()} className="btn btn-primary">
+              <Plus size={16} />
+              Asset hinzufügen
+            </button>
+          </div>
+        </div>
+        
         {filteredItems.length === 0 ? (
           <div className="empty-state">
             <Package size={64} />
@@ -256,40 +260,53 @@ function App() {
             <p>Fügen Sie Ihr erstes Asset hinzu oder ändern Sie Ihre Suchkriterien.</p>
           </div>
         ) : (
-          filteredItems.map(item => (
-            <div key={item.id} className="item-card">
-              <div className="item-header">
-                <h3>{item.name}</h3>
-                <div className="item-actions">
-                  <button
-                    onClick={() => openModal(item)}
-                    className="btn-icon"
-                    title="Bearbeiten"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    onClick={() => deleteItem(item.id)}
-                    className="btn-icon danger"
-                    title="Löschen"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-              {item.description && (
-                <p className="item-description">{item.description}</p>
-              )}
-              <div className="item-quantity">
-                <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
-                  {item.quantity} Stück
-                </span>
-              </div>
-              <div className="item-meta">
-                <small>Erstellt: {new Date(item.createdAt).toLocaleDateString('de-DE')}</small>
-              </div>
-            </div>
-          ))
+          <table className="items-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Beschreibung</th>
+                <th>Anzahl</th>
+                <th>Erstellt</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.map(item => (
+                <tr key={item.id}>
+                  <td className="col-name">{item.name}</td>
+                  <td className="col-description">
+                    {item.description || '-'}
+                  </td>
+                  <td className="col-quantity">
+                    <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
+                      {item.quantity}
+                    </span>
+                  </td>
+                  <td className="col-date">
+                    {new Date(item.createdAt).toLocaleDateString('de-DE')}
+                  </td>
+                  <td className="col-actions">
+                    <div className="table-actions-cell">
+                      <button
+                        onClick={() => openModal(item)}
+                        className="btn-icon"
+                        title="Bearbeiten"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        onClick={() => deleteItem(item.id)}
+                        className="btn-icon danger"
+                        title="Löschen"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
