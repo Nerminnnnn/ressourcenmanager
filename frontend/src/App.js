@@ -420,10 +420,6 @@ function App() {
           <p className="stat-number">{items.length}</p>
         </div>
         <div className="stat-card">
-          <h3>Niedrige Bestände</h3>
-          <p className="stat-number warning">{lowStockItems.length}</p>
-        </div>
-        <div className="stat-card">
           <h3>Gesamt Stückzahl</h3>
           <p className="stat-number">{items.reduce((sum, item) => sum + item.quantity, 0)}</p>
         </div>
