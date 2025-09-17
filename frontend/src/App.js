@@ -17,8 +17,8 @@ function App() {
   const [filters, setFilters] = useState({
     quantityFilter: 'all', // all, low, medium, high
     dateFilter: 'all', // all, today, week, month
-    sortBy: 'name', // name, quantity, date
-    sortOrder: 'asc' // asc, desc
+    sortBy: 'date', // name, quantity, date
+    sortOrder: 'desc' // asc, desc
   });
   const [formData, setFormData] = useState({
     name: '',
@@ -243,8 +243,8 @@ function App() {
     setFilters({
       quantityFilter: 'all',
       dateFilter: 'all',
-      sortBy: 'name',
-      sortOrder: 'asc'
+      sortBy: 'date',
+      sortOrder: 'desc'
     });
     setSearchTerm('');
   };
@@ -532,6 +532,39 @@ function App() {
                   required
                 />
               </div>
+              
+              {/* Datumsanzeige */}
+              {editingItem && (
+                <div className="form-group">
+                  <div className="date-info">
+                    <div className="date-item">
+                      <label className="date-label">Erstellt:</label>
+                      <span className="date-value">
+                        {new Date(editingItem.createdAt).toLocaleString('de-DE', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                    <div className="date-item">
+                      <label className="date-label">Zuletzt bearbeitet:</label>
+                      <span className="date-value">
+                        {new Date(editingItem.updatedAt || editingItem.createdAt).toLocaleString('de-DE', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="modal-actions">
                 <button type="button" onClick={closeModal} className="btn">
                   Abbrechen
