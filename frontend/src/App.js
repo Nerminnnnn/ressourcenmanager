@@ -14,6 +14,12 @@ function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [useMockApi, setUseMockApi] = useState(false);
+  const [filters, setFilters] = useState({
+    quantityFilter: 'all', // all, low, medium, high
+    dateFilter: 'all', // all, today, week, month
+    sortBy: 'date', // name, quantity, date
+    sortOrder: 'desc' // asc, desc
+  });
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -142,10 +148,106 @@ function App() {
   };
 
   // Items filtern
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Filter-Funktionen
+  const applyFilters = (items) => {
+    let filtered = items;
+
+    // Suchfilter
+    if (searchTerm) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Mengenfilter
+    if (filters.quantityFilter !== 'all') {
+      filtered = filtered.filter(item => {
+        switch (filters.quantityFilter) {
+          case 'low':
+            return item.quantity < 5;
+          case 'medium':
+            return item.quantity >= 5 && item.quantity < 20;
+          case 'high':
+            return item.quantity >= 20;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Datumsfilter
+    if (filters.dateFilter !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.createdAt);
+        switch (filters.dateFilter) {
+          case 'today':
+            return itemDate.toDateString() === now.toDateString();
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            return itemDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            return itemDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Sortierung
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (filters.sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'quantity':
+          aValue = a.quantity;
+          bValue = b.quantity;
+          break;
+        case 'date':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      if (filters.sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  };
+
+  // Gefilterte Items
+  const filteredItems = applyFilters(items);
+
+  // Filter-Funktionen
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      quantityFilter: 'all',
+      dateFilter: 'all',
+      sortBy: 'date',
+      sortOrder: 'desc'
+    });
+    setSearchTerm('');
+  };
 
   // Low stock items
   const lowStockItems = items.filter(item => item.quantity < 5);
@@ -177,23 +279,21 @@ function App() {
   return (
     <div className="container">
       <header className="header">
-        <h1>
-          <Package className="header-icon" />
-          Asset Manager
-        </h1>
-        <p>Verwalten Sie Ihre Assets effizient</p>
-        <div className="connection-status">
-          {useMockApi ? (
-            <div className="status-indicator offline">
-              <WifiOff size={16} />
-              Demo-Modus (Backend nicht verfügbar)
-            </div>
-          ) : (
-            <div className="status-indicator online">
-              <Wifi size={16} />
-              Verbunden mit Backend
-            </div>
-          )}
+        <div className="header-content">
+          <h1>Asset Manager</h1>
+          <div className="header-actions">
+            {useMockApi ? (
+              <div className="status-indicator offline">
+                <WifiOff size={16} />
+                Demo-Modus
+              </div>
+            ) : (
+              <div className="status-indicator online">
+                <Wifi size={16} />
+                Verbunden
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -209,12 +309,6 @@ function App() {
         </div>
       )}
 
-      {lowStockItems.length > 0 && (
-        <div className="alert alert-error">
-          <AlertTriangle className="alert-icon" />
-          <strong>Niedrige Bestände:</strong> {lowStockItems.length} Item(s) haben weniger als 5 Stück
-        </div>
-      )}
 
       <div className="controls">
         <div className="search-container">
@@ -227,10 +321,6 @@ function App() {
               className="search-input"
             />
         </div>
-        <button onClick={() => openModal()} className="btn btn-primary">
-          <Plus size={20} />
-          Neues Asset
-        </button>
       </div>
 
       <div className="stats">
@@ -239,16 +329,113 @@ function App() {
           <p className="stat-number">{items.length}</p>
         </div>
         <div className="stat-card">
-          <h3>Niedrige Bestände</h3>
-          <p className="stat-number warning">{lowStockItems.length}</p>
-        </div>
-        <div className="stat-card">
           <h3>Gesamt Stückzahl</h3>
           <p className="stat-number">{items.reduce((sum, item) => sum + item.quantity, 0)}</p>
         </div>
       </div>
 
-      <div className="items-grid">
+      {/* Filter-Bereich direkt über der Tabelle */}
+      <div className="filters-section">
+        <div className="filters-header">
+          <h3>Filter & Sortierung</h3>
+          <button onClick={resetFilters} className="btn btn-secondary">
+            Filter zurücksetzen
+          </button>
+        </div>
+        
+        <div className="filters-grid">
+          <div className="filter-group">
+            <label className="filter-label">Menge</label>
+            <select 
+              value={filters.quantityFilter} 
+              onChange={(e) => handleFilterChange('quantityFilter', e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">Alle Mengen</option>
+              <option value="low">Niedrig (&lt; 5)</option>
+              <option value="medium">Mittel (5-19)</option>
+              <option value="high">Hoch (≥ 20)</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Erstellt</label>
+            <select 
+              value={filters.dateFilter} 
+              onChange={(e) => handleFilterChange('dateFilter', e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">Alle Daten</option>
+              <option value="today">Heute</option>
+              <option value="week">Letzte Woche</option>
+              <option value="month">Letzter Monat</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Sortieren nach</label>
+            <select 
+              value={filters.sortBy} 
+              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+              className="filter-select"
+            >
+              <option value="name">Name</option>
+              <option value="quantity">Menge</option>
+              <option value="date">Erstellungsdatum</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Reihenfolge</label>
+            <select 
+              value={filters.sortOrder} 
+              onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
+              className="filter-select"
+            >
+              <option value="asc">Aufsteigend</option>
+              <option value="desc">Absteigend</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Aktive Filter anzeigen */}
+        {(filters.quantityFilter !== 'all' || filters.dateFilter !== 'all' || searchTerm) && (
+          <div className="active-filters">
+            <span className="active-filters-label">Aktive Filter:</span>
+            <div className="active-filters-list">
+              {searchTerm && (
+                <span className="filter-tag">
+                  Suche: "{searchTerm}"
+                </span>
+              )}
+              {filters.quantityFilter !== 'all' && (
+                <span className="filter-tag">
+                  Menge: {filters.quantityFilter === 'low' ? 'Niedrig' : 
+                          filters.quantityFilter === 'medium' ? 'Mittel' : 'Hoch'}
+                </span>
+              )}
+              {filters.dateFilter !== 'all' && (
+                <span className="filter-tag">
+                  Datum: {filters.dateFilter === 'today' ? 'Heute' : 
+                          filters.dateFilter === 'week' ? 'Letzte Woche' : 'Letzter Monat'}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="table-container">
+        <div className="table-header">
+          <h2 className="table-title">Assets ({filteredItems.length})</h2>
+          <div className="table-actions">
+            <button onClick={() => openModal()} className="btn btn-primary">
+              <Plus size={16} />
+              Asset hinzufügen
+            </button>
+          </div>
+        </div>
+        
         {filteredItems.length === 0 ? (
           <div className="empty-state">
             <Package size={64} />
@@ -256,40 +443,55 @@ function App() {
             <p>Fügen Sie Ihr erstes Asset hinzu oder ändern Sie Ihre Suchkriterien.</p>
           </div>
         ) : (
-          filteredItems.map(item => (
-            <div key={item.id} className="item-card">
-              <div className="item-header">
-                <h3>{item.name}</h3>
-                <div className="item-actions">
-                  <button
-                    onClick={() => openModal(item)}
-                    className="btn-icon"
-                    title="Bearbeiten"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    onClick={() => deleteItem(item.id)}
-                    className="btn-icon danger"
-                    title="Löschen"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-              {item.description && (
-                <p className="item-description">{item.description}</p>
-              )}
-              <div className="item-quantity">
-                <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
-                  {item.quantity} Stück
-                </span>
-              </div>
-              <div className="item-meta">
-                <small>Erstellt: {new Date(item.createdAt).toLocaleDateString('de-DE')}</small>
-              </div>
-            </div>
-          ))
+              <table className="items-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Beschreibung</th>
+                    <th>Anzahl</th>
+                    <th>Erstellt</th>
+                    <th>Aktionen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredItems.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className="col-id">{index + 1}</td>
+                      <td className="col-name">{item.name}</td>
+                      <td className="col-description">
+                        {item.description || '-'}
+                      </td>
+                      <td className="col-quantity">
+                        <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
+                          {item.quantity}
+                        </span>
+                      </td>
+                      <td className="col-date">
+                        {new Date(item.createdAt).toLocaleDateString('de-DE')}
+                      </td>
+                      <td className="col-actions">
+                        <div className="table-actions-cell">
+                          <button
+                            onClick={() => openModal(item)}
+                            className="btn-icon"
+                            title="Bearbeiten"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => deleteItem(item.id)}
+                            className="btn-icon danger"
+                            title="Löschen"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+          </table>
         )}
       </div>
 
@@ -332,6 +534,39 @@ function App() {
                   required
                 />
               </div>
+              
+              {/* Datumsanzeige */}
+              {editingItem && (
+                <div className="form-group">
+                  <div className="date-info">
+                    <div className="date-item">
+                      <label className="date-label">Erstellt:</label>
+                      <span className="date-value">
+                        {new Date(editingItem.createdAt).toLocaleString('de-DE', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                    <div className="date-item">
+                      <label className="date-label">Zuletzt bearbeitet:</label>
+                      <span className="date-value">
+                        {new Date(editingItem.updatedAt || editingItem.createdAt).toLocaleString('de-DE', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="modal-actions">
                 <button type="button" onClick={closeModal} className="btn">
                   Abbrechen
