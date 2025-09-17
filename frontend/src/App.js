@@ -443,52 +443,54 @@ function App() {
             <p>Fügen Sie Ihr erstes Asset hinzu oder ändern Sie Ihre Suchkriterien.</p>
           </div>
         ) : (
-          <table className="items-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Beschreibung</th>
-                <th>Anzahl</th>
-                <th>Erstellt</th>
-                <th>Aktionen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredItems.map(item => (
-                <tr key={item.id}>
-                  <td className="col-name">{item.name}</td>
-                  <td className="col-description">
-                    {item.description || '-'}
-                  </td>
-                  <td className="col-quantity">
-                    <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
-                      {item.quantity}
-                    </span>
-                  </td>
-                  <td className="col-date">
-                    {new Date(item.createdAt).toLocaleDateString('de-DE')}
-                  </td>
-                  <td className="col-actions">
-                    <div className="table-actions-cell">
-                      <button
-                        onClick={() => openModal(item)}
-                        className="btn-icon"
-                        title="Bearbeiten"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => deleteItem(item.id)}
-                        className="btn-icon danger"
-                        title="Löschen"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+              <table className="items-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Beschreibung</th>
+                    <th>Anzahl</th>
+                    <th>Erstellt</th>
+                    <th>Aktionen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredItems.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className="col-id">{index + 1}</td>
+                      <td className="col-name">{item.name}</td>
+                      <td className="col-description">
+                        {item.description || '-'}
+                      </td>
+                      <td className="col-quantity">
+                        <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
+                          {item.quantity}
+                        </span>
+                      </td>
+                      <td className="col-date">
+                        {new Date(item.createdAt).toLocaleDateString('de-DE')}
+                      </td>
+                      <td className="col-actions">
+                        <div className="table-actions-cell">
+                          <button
+                            onClick={() => openModal(item)}
+                            className="btn-icon"
+                            title="Bearbeiten"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => deleteItem(item.id)}
+                            className="btn-icon danger"
+                            title="Löschen"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
           </table>
         )}
       </div>

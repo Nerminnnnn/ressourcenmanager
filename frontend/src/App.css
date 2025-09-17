@@ -235,6 +235,15 @@
 }
 
 /* Tabellen-Spalten */
+.col-id {
+  font-weight: 600;
+  color: #666666;
+  font-size: 14px;
+  text-align: center;
+  width: 80px;
+  min-width: 80px;
+}
+
 .col-name {
   font-weight: 500;
   color: #1a1a1a;
