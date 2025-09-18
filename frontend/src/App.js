@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Package, Search, Edit, Trash2, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { Plus, Package, Search, Edit, Trash2, AlertTriangle, Wifi, WifiOff, Filter } from 'lucide-react';
 import './App.css';
 import { mockApi } from './mockApi';
 
@@ -14,6 +14,7 @@ function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [useMockApi, setUseMockApi] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     quantityFilter: 'all', // all, low, medium, high
     dateFilter: 'all', // all, today, week, month
@@ -313,13 +314,28 @@ function App() {
       <div className="controls">
         <div className="search-container">
           <Search className="search-icon" />
-            <input
-              type="text"
-              placeholder="Assets durchsuchen..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
+          <input
+            type="text"
+            placeholder="Assets durchsuchen..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
+        <div className="view-controls">
+          <button 
+            onClick={() => setShowFilters(!showFilters)} 
+            className={`filter-btn ${showFilters ? 'active' : ''}`}
+            title="Filter"
+          >
+            <Filter size={16} />
+            Filter
+          </button>
+          <button onClick={() => openModal()} className="btn btn-primary">
+            <Plus size={16} />
+            Asset hinzufügen
+          </button>
         </div>
       </div>
 
@@ -332,10 +348,19 @@ function App() {
           <h3>Gesamt Stückzahl</h3>
           <p className="stat-number">{items.reduce((sum, item) => sum + item.quantity, 0)}</p>
         </div>
+        <div className="stat-card">
+          <h3>Niedrige Bestände</h3>
+          <p className="stat-number">{lowStockItems.length}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Durchschnitt</h3>
+          <p className="stat-number">{items.length > 0 ? Math.round(items.reduce((sum, item) => sum + item.quantity, 0) / items.length) : 0}</p>
+        </div>
       </div>
 
-      {/* Filter-Bereich direkt über der Tabelle */}
-      <div className="filters-section">
+      {/* Filter Section */}
+      {showFilters && (
+        <div className="filters-section">
         <div className="filters-header">
           <h3>Filter & Sortierung</h3>
           <button onClick={resetFilters} className="btn btn-secondary">
@@ -423,17 +448,13 @@ function App() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
-      <div className="table-container">
-        <div className="table-header">
-          <h2 className="table-title">Assets ({filteredItems.length})</h2>
-          <div className="table-actions">
-            <button onClick={() => openModal()} className="btn btn-primary">
-              <Plus size={16} />
-              Asset hinzufügen
-            </button>
-          </div>
+      {/* Content Area */}
+      <div className="content-area">
+        <div className="content-header">
+          <h2 className="content-title">Assets ({filteredItems.length})</h2>
         </div>
         
         {filteredItems.length === 0 ? (
@@ -443,55 +464,57 @@ function App() {
             <p>Fügen Sie Ihr erstes Asset hinzu oder ändern Sie Ihre Suchkriterien.</p>
           </div>
         ) : (
-              <table className="items-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Beschreibung</th>
-                    <th>Anzahl</th>
-                    <th>Erstellt</th>
-                    <th>Aktionen</th>
+          <div className="table-container">
+            <table className="items-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Beschreibung</th>
+                  <th>Anzahl</th>
+                  <th>Erstellt</th>
+                  <th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredItems.map((item, index) => (
+                  <tr key={item.id}>
+                    <td className="col-id">{index + 1}</td>
+                    <td className="col-name">{item.name}</td>
+                    <td className="col-description">
+                      {item.description || '-'}
+                    </td>
+                    <td className="col-quantity">
+                      <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
+                        {item.quantity}
+                      </span>
+                    </td>
+                    <td className="col-date">
+                      {new Date(item.createdAt).toLocaleDateString('de-DE')}
+                    </td>
+                    <td className="col-actions">
+                      <div className="table-actions-cell">
+                        <button
+                          onClick={() => openModal(item)}
+                          className="btn-icon"
+                          title="Bearbeiten"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => deleteItem(item.id)}
+                          className="btn-icon danger"
+                          title="Löschen"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filteredItems.map((item, index) => (
-                    <tr key={item.id}>
-                      <td className="col-id">{index + 1}</td>
-                      <td className="col-name">{item.name}</td>
-                      <td className="col-description">
-                        {item.description || '-'}
-                      </td>
-                      <td className="col-quantity">
-                        <span className={`quantity-badge ${item.quantity < 5 ? 'low' : ''}`}>
-                          {item.quantity}
-                        </span>
-                      </td>
-                      <td className="col-date">
-                        {new Date(item.createdAt).toLocaleDateString('de-DE')}
-                      </td>
-                      <td className="col-actions">
-                        <div className="table-actions-cell">
-                          <button
-                            onClick={() => openModal(item)}
-                            className="btn-icon"
-                            title="Bearbeiten"
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={() => deleteItem(item.id)}
-                            className="btn-icon danger"
-                            title="Löschen"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
