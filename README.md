@@ -1,6 +1,6 @@
 # Ressourcenmanager
 
-Eine moderne Web-Anwendung zur Verwaltung von Items/Ressourcen, entwickelt mit Java Spring Boot Backend und React Frontend.
+Eine moderne Web-Anwendung zur Verwaltung von Items/Ressourcen, entwickelt mit Node.js/Express Backend und React Frontend.
 
 ## Features
 
@@ -10,31 +10,29 @@ Eine moderne Web-Anwendung zur Verwaltung von Items/Ressourcen, entwickelt mit J
 - ✅ Responsive Design für Desktop und Mobile
 - ✅ Moderne UI mit Material Design
 - ✅ REST API Backend
-- ✅ MySQL Datenbank
+- ✅ SQLite Datenbank
 
 ## Technologie-Stack
 
 ### Backend
-- Java 17
-- Spring Boot 3.2.0
-- Spring Data JPA
-- MySQL 8.0
-- Maven
+- Node.js 16+
+- Express.js
+- SQLite3
+- CORS Support
+- UUID für IDs
 
 ### Frontend
 - React 18
 - JavaScript ES6+
 - CSS3 mit modernen Features
 - Lucide React Icons
-- Axios für API-Calls
+- Fetch API für HTTP-Requests
 
 ## Installation und Setup
 
 ### Voraussetzungen
 - **Node.js 16 oder höher** (erforderlich)
-- **Java 17 oder höher** (optional, für Backend)
-- **Maven 3.6 oder höher** (optional, für Backend)
-- **MySQL 8.0 oder höher** (optional, H2-Datenbank wird automatisch verwendet)
+- **npm 8 oder höher** (erforderlich)
 
 ### 🚀 Schnellstart (Empfohlen)
 
@@ -49,53 +47,29 @@ npm run dev
 
 Die Anwendung startet automatisch:
 - **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:8080 (falls Maven verfügbar)
-- **Status**: Backend + Frontend oder nur Frontend (Demo-Modus)
+- **Backend**: http://localhost:3001
+- **Datenbank**: SQLite (automatisch erstellt)
 
-#### Mit MySQL (für Hosting):
-```bash
-# 1. MySQL installieren (siehe MYSQL_INSTALL.md)
-# 2. Datenbank einrichten
-setup-mysql.bat
+### 🔧 Manuelles Setup
 
-# 3. Anwendung starten
-npm run dev
-```
-
-Die Anwendung startet mit MySQL:
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:8080
-- **MySQL**: localhost:3306
-- **MySQL Workbench**: Verbindung zu localhost:3306
-
-### 🔧 Manuelles Setup (Falls automatisch nicht funktioniert)
-
-#### 1. Datenbank Setup
-```bash
-# Automatisch (empfohlen)
-node setup.js
-
-# Oder manuell in MySQL Workbench:
-# Führen Sie das SQL-Script aus: database/setup.sql
-```
-
-#### 2. Dependencies installieren
+#### 1. Dependencies installieren
 ```bash
 # Frontend
 cd frontend
 npm install
 
-# Backend (im Hauptverzeichnis)
-mvn clean install
+# Backend
+cd backend
+npm install
 ```
 
-#### 3. Anwendung starten
+#### 2. Anwendung starten
 ```bash
-# Beide gleichzeitig
+# Beide gleichzeitig (aus dem Hauptverzeichnis)
 npm run dev
 
 # Oder einzeln:
-# Backend: mvn spring-boot:run
+# Backend: cd backend && npm run dev
 # Frontend: cd frontend && npm start
 ```
 
@@ -112,42 +86,33 @@ npm run dev
 
 ## Datenbank-Konfiguration
 
-Die Anwendung ist für MySQL konfiguriert mit folgenden Einstellungen:
+Die Anwendung verwendet SQLite als Datenbank:
 
-- **Host:** localhost:3306
-- **Datenbank:** ressourcenmanager
-- **Benutzername:** root
-- **Passwort:** didpwvCSR123
-
-Diese Einstellungen können in `src/main/resources/application.properties` angepasst werden.
+- **Typ:** SQLite
+- **Datei:** `backend/database.sqlite` (automatisch erstellt)
+- **Setup:** Automatisch beim ersten Start
+- **Sample Data:** Wird automatisch eingefügt
 
 ## Projektstruktur
 
 ```
 Ressourcenmanager/
-├── src/main/java/com/ressourcenmanager/
-│   ├── RessourcenmanagerApplication.java
-│   ├── controller/
-│   │   └── ItemController.java
-│   ├── model/
-│   │   └── Item.java
-│   ├── repository/
-│   │   └── ItemRepository.java
-│   └── service/
-│       └── ItemService.java
-├── src/main/resources/
-│   └── application.properties
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── database.sqlite (automatisch erstellt)
 ├── frontend/
 │   ├── public/
 │   ├── src/
 │   │   ├── App.js
 │   │   ├── App.css
 │   │   ├── index.js
-│   │   └── index.css
+│   │   ├── index.css
+│   │   └── mockApi.js
 │   └── package.json
 ├── database/
-│   └── setup.sql
-├── pom.xml
+│   └── setup.sql (nicht mehr benötigt)
+├── package.json
 └── README.md
 ```
 
@@ -163,7 +128,8 @@ Ressourcenmanager/
 
 ### Backend entwickeln
 ```bash
-mvn spring-boot:run
+cd backend
+npm run dev
 ```
 
 ### Frontend entwickeln
@@ -174,9 +140,6 @@ npm start
 
 ### Tests ausführen
 ```bash
-# Backend Tests
-mvn test
-
 # Frontend Tests
 cd frontend
 npm test
