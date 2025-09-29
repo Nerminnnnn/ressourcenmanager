@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Package, Search, Edit, Trash2, AlertTriangle, Wifi, WifiOff, Filter } from 'lucide-react';
+import { Plus, Package, Search, Edit, Trash2, Wifi, WifiOff, Filter } from 'lucide-react';
 import './App.css';
 import { mockApi } from './mockApi';
 
