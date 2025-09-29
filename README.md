@@ -1,150 +1,78 @@
-# Ressourcenmanager
+# 🏢 Ressourcenmanager
 
-Eine moderne Web-Anwendung zur Verwaltung von Items/Ressourcen, entwickelt mit Node.js/Express Backend und React Frontend.
+Ein modernes Asset Management System mit React Frontend und Node.js Backend.
 
-## Features
+## 🚀 Live Demo
 
-- ✅ Items hinzufügen, bearbeiten und löschen
-- ✅ Suchfunktion für Items
-- ✅ Bestandsverwaltung mit Warnung bei niedrigen Beständen
-- ✅ Responsive Design für Desktop und Mobile
-- ✅ Moderne UI mit Material Design
-- ✅ REST API Backend
-- ✅ SQLite Datenbank
+- **Frontend:** [Vercel](https://ressourcenmanager.vercel.app)
+- **Backend API:** [Railway](https://ressourcenmanager-backend.railway.app/api)
 
-## Technologie-Stack
-
-### Backend
-- Node.js 16+
-- Express.js
-- SQLite3
-- CORS Support
-- UUID für IDs
+## 🛠️ Tech Stack
 
 ### Frontend
-- React 18
-- JavaScript ES6+
-- CSS3 mit modernen Features
-- Lucide React Icons
-- Fetch API für HTTP-Requests
+- **React 18** - Moderne UI-Bibliothek
+- **Lucide React** - Icons
+- **Vercel** - Hosting & Deployment
 
-## Installation und Setup
+### Backend
+- **Node.js** - Server Runtime
+- **Express.js** - Web Framework
+- **MySQL** - Datenbank
+- **Railway** - Hosting & Deployment
 
-### Voraussetzungen
-- **Node.js 16 oder höher** (erforderlich)
-- **npm 8 oder höher** (erforderlich)
-
-### 🚀 Schnellstart (Empfohlen)
-
-#### Vollständige Anwendung starten:
-```bash
-# 1. Dependencies installieren
-npm install
-
-# 2. Anwendung starten (Backend + Frontend)
-npm run dev
-```
-
-Die Anwendung startet automatisch:
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:3001
-- **Datenbank**: SQLite (automatisch erstellt)
-
-### 🔧 Manuelles Setup
-
-#### 1. Dependencies installieren
-```bash
-# Frontend
-cd frontend
-npm install
-
-# Backend
-cd backend
-npm install
-```
-
-#### 2. Anwendung starten
-```bash
-# Beide gleichzeitig (aus dem Hauptverzeichnis)
-npm run dev
-
-# Oder einzeln:
-# Backend: cd backend && npm run dev
-# Frontend: cd frontend && npm start
-```
-
-## API Endpoints
-
-### Items
-- `GET /api/items` - Alle Items abrufen
-- `GET /api/items/{id}` - Item nach ID abrufen
-- `POST /api/items` - Neues Item erstellen
-- `PUT /api/items/{id}` - Item aktualisieren
-- `DELETE /api/items/{id}` - Item löschen
-- `GET /api/items/search?q={term}` - Items durchsuchen
-- `GET /api/items/low-stock?threshold={number}` - Items mit niedrigem Bestand
-
-## Datenbank-Konfiguration
-
-Die Anwendung verwendet SQLite als Datenbank:
-
-- **Typ:** SQLite
-- **Datei:** `backend/database.sqlite` (automatisch erstellt)
-- **Setup:** Automatisch beim ersten Start
-- **Sample Data:** Wird automatisch eingefügt
-
-## Projektstruktur
+## 📁 Projektstruktur
 
 ```
-Ressourcenmanager/
-├── backend/
+├── frontend/              # React Frontend (Vercel)
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── vercel.json
+├── backend/               # Node.js Backend (Railway)
 │   ├── server.js
 │   ├── package.json
-│   └── database.sqlite (automatisch erstellt)
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── App.js
-│   │   ├── App.css
-│   │   ├── index.js
-│   │   ├── index.css
-│   │   └── mockApi.js
-│   └── package.json
+│   ├── railway.json
+│   └── env.example
 ├── database/
-│   └── setup.sql (nicht mehr benötigt)
-├── package.json
-└── README.md
+│   └── setup.sql          # MySQL Setup
+└── DEPLOYMENT.md          # Deployment Guide
 ```
 
-## Verwendung
+## 🚀 Features
 
-1. Öffnen Sie http://localhost:3000 in Ihrem Browser
-2. Sie sehen eine Liste aller Items mit Suchfunktion
-3. Klicken Sie auf "Neues Item" um ein Item hinzuzufügen
-4. Verwenden Sie die Bearbeiten/Löschen-Buttons für bestehende Items
-5. Items mit niedrigem Bestand (< 5) werden rot markiert
+- ✅ **Asset Management** - Hinzufügen, Bearbeiten, Löschen
+- ✅ **Suchfunktion** - Durchsuchen von Assets
+- ✅ **Filter & Sortierung** - Nach Menge, Datum, etc.
+- ✅ **Low Stock Alerts** - Warnung bei niedrigen Beständen
+- ✅ **Responsive Design** - Mobile & Desktop optimiert
+- ✅ **Real-time Updates** - Live Daten ohne Reload
 
-## Entwicklung
+## 🔧 Lokale Entwicklung
 
-### Backend entwickeln
+### Backend starten:
 ```bash
 cd backend
+npm install
+cp env.example .env
+# Bearbeite .env mit deinen MySQL-Daten
 npm run dev
 ```
 
-### Frontend entwickeln
+### Frontend starten:
 ```bash
 cd frontend
+npm install
 npm start
 ```
 
-### Tests ausführen
-```bash
-# Frontend Tests
-cd frontend
-npm test
-```
+## 📦 Deployment
 
-## Lizenz
+Siehe [DEPLOYMENT.md](DEPLOYMENT.md) für detaillierte Anweisungen.
 
-Dieses Projekt ist für Bildungszwecke erstellt.
+## 👨‍💻 Autor
+
+**Nermin Nokic** - Asset Management System
+
+## 📄 Lizenz
+
+MIT License
